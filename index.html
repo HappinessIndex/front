@@ -2,79 +2,126 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>D3 Test</title>
-<!--         <link rel="stylesheet" type="text/css" href="style.css"> -->
+        <title> Map Test</title>
+        <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
         <script type="text/javascript" src="d3.v3.js"></script> 
         <script type="text/javascript" src="tip.js"></script> 
-
+        <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
+        <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet'/>
+        <script src='http://code.jquery.com/jquery-2.1.4.js'></script>
+        <script src='graph.js'></script>
+        <script src='map.js'></script>
+        <script src='us-states.js'></script>
+        <link href='http://fonts.googleapis.com/css?family=Marcellus+SC|Londrina+Solid|Fugaz+One|Monoton|Cinzel|Julius+Sans+One' rel='stylesheet' type='text/css'>
         <style type="text/css">
-    		body{
-    			background: #dddddd;
-    		}
+
+             body { 
+                margin: 0; 
+                padding: 0;
+                height: 100%;
+                width: 100%; 
+                background: #141445;
+            }
+             #map { 
+                margin: 0 auto;
+                margin-top: 40px;
+                top: 0; 
+                bottom: 0; 
+                width: 1600px;
+                height: 900px;
+            }
+            .bar {
+                fill: #3355ff;
+                -moz-transition: all 0.2s;
+                -webkit-transition: all 0.2s;
+                -o-transition: all 0.2s;
+                transition: all 0.2s;
+            }
+            .bar:hover {
+              fill: #ff6633;
+            }
+            .svg{
+                position: relative;
+                display: block;
+                margin: auto;
+                width: 200px;
+            }
+            .d3-tip {
+                line-height: 1;
+                font-weight: bold;
+                padding: 12px;
+                background: rgba(0, 0, 0, 0.7);
+                color: #fff;
+                border-radius: 5px;
+                z-index: 1000;
+                font-family: 'Cinzel', serif;
+
+            }
+            .d3-tip:after {
+                box-sizing: border-box;
+                display: inline;
+                font-size: 10px;
+                width: 100%;
+                line-height: 1;
+                color: rgba(0, 0, 0, 0.7);
+                content: "\25BC";
+                position: absolute;
+                text-align: center;
+            }
+            .d3-tip.n:after {
+                margin: -1px 0 0 0;
+                top: 100%;
+                left: 0;
+            }
+            #graph {
+                position: absolute;
+/*              top: 8.75em;
+                right: 12em;*/
+                background: rgba(125, 125, 125, 0.4);
+                width: 500px;
+                height: 260px;
+            }
+            .graphTitle{
+                background: rgba(125, 125, 125, 0.4);
+                text-align: center;
+                color: #00ffbb;
+                margin-top: 5px;
+                margin-bottom: 0px; 
+                margin-left: 80px;
+                margin-right: 80px;           
+            }
+            .graphBox {
+                padding: 6px 8px;
+                font-size:16px;
+                font: 20px/16px;
+                font-family: 'Cinzel', serif;
+                background: white;
+                background: rgba(255,255,255,0.8);
+                box-shadow: 0 0 15px rgba(0,0,0,0.2);
+                border-radius: 5px;
+                width: 500px;
+                height: 260px;
+            }            
+            .graphBox h4 {
+                margin: 0 0 5px;
+                color: #000;
+                font-weight: bold;
+                font-size:20px;
+            }
+                		
 		</style>     
     </head>
     <body>
 
-        <script type="text/javascript">
 
-		var statesData = {"type":"FeatureCollection","features":[
-		{"type":"Feature","id":"01","properties":{"AU12":"573101","happinessIndex":7},"geometry":{"type":"Polygon","coordinates":[[[-87.359296,35.00118],[-85.606675,34.984749],[-85.431413,34.124869],[-85.184951,32.859696],[-85.069935,32.580372],[-84.960397,32.421541],[-85.004212,32.322956],[-84.889196,32.262709],[-85.058981,32.13674],[-85.053504,32.01077],[-85.141136,31.840985],[-85.042551,31.539753],[-85.113751,31.27686],[-85.004212,31.003013],[-85.497137,30.997536],[-87.600282,30.997536],[-87.633143,30.86609],[-87.408589,30.674397],[-87.446927,30.510088],[-87.37025,30.427934],[-87.518128,30.280057],[-87.655051,30.247195],[-87.90699,30.411504],[-87.934375,30.657966],[-88.011052,30.685351],[-88.10416,30.499135],[-88.137022,30.318396],[-88.394438,30.367688],[-88.471115,31.895754],[-88.241084,33.796253],[-88.098683,34.891641],[-88.202745,34.995703],[-87.359296,35.00118]]]}},
-		{"type":"Feature","id":"02","properties":
-		{"AU12":"573102","happinessIndex":5},"geometry":{"type":"Polygon","coordinates":[[[-87.359296,35.00118],[-85.606675,34.984749],[-85.431413,34.124869],[-85.184951,32.859696],[-85.069935,32.580372],[-84.960397,32.421541],[-85.004212,32.322956],[-84.889196,32.262709],[-85.058981,32.13674],[-85.053504,32.01077],[-85.141136,31.840985],[-85.042551,31.539753],[-85.113751,31.27686],[-85.004212,31.003013],[-85.497137,30.997536],[-87.600282,30.997536],[-87.633143,30.86609],[-87.408589,30.674397],[-87.446927,30.510088],[-87.37025,30.427934],[-87.518128,30.280057],[-87.655051,30.247195],[-87.90699,30.411504],[-87.934375,30.657966],[-88.011052,30.685351],[-88.10416,30.499135],[-88.137022,30.318396],[-88.394438,30.367688],[-88.471115,31.895754],[-88.241084,33.796253],[-88.098683,34.891641],[-88.202745,34.995703],[-87.359296,35.00118]]]}},
-		{"type":"Feature","id":"03","properties":
-		{"AU12":"573101","happinessIndex":7},"geometry":{"type":"Polygon","coordinates":[[[-87.359296,35.00118],[-85.606675,34.984749],[-85.431413,34.124869],[-85.184951,32.859696],[-85.069935,32.580372],[-84.960397,32.421541],[-85.004212,32.322956],[-84.889196,32.262709],[-85.058981,32.13674],[-85.053504,32.01077],[-85.141136,31.840985],[-85.042551,31.539753],[-85.113751,31.27686],[-85.004212,31.003013],[-85.497137,30.997536],[-87.600282,30.997536],[-87.633143,30.86609],[-87.408589,30.674397],[-87.446927,30.510088],[-87.37025,30.427934],[-87.518128,30.280057],[-87.655051,30.247195],[-87.90699,30.411504],[-87.934375,30.657966],[-88.011052,30.685351],[-88.10416,30.499135],[-88.137022,30.318396],[-88.394438,30.367688],[-88.471115,31.895754],[-88.241084,33.796253],[-88.098683,34.891641],[-88.202745,34.995703],[-87.359296,35.00118]]]}},
-		{"type":"Feature","id":"04","properties":
-		{"AU12":"573103","happinessIndex":1},"geometry":{"type":"Polygon","coordinates":[[[-87.359296,35.00118],[-85.606675,34.984749],[-85.431413,34.124869],[-85.184951,32.859696],[-85.069935,32.580372],[-84.960397,32.421541],[-85.004212,32.322956],[-84.889196,32.262709],[-85.058981,32.13674],[-85.053504,32.01077],[-85.141136,31.840985],[-85.042551,31.539753],[-85.113751,31.27686],[-85.004212,31.003013],[-85.497137,30.997536],[-87.600282,30.997536],[-87.633143,30.86609],[-87.408589,30.674397],[-87.446927,30.510088],[-87.37025,30.427934],[-87.518128,30.280057],[-87.655051,30.247195],[-87.90699,30.411504],[-87.934375,30.657966],[-88.011052,30.685351],[-88.10416,30.499135],[-88.137022,30.318396],[-88.394438,30.367688],[-88.471115,31.895754],[-88.241084,33.796253],[-88.098683,34.891641],[-88.202745,34.995703],[-87.359296,35.00118]]]}},
-		{"type":"Feature","id":"05","properties":
-		{"AU12":"573104","happinessIndex":4},"geometry":{"type":"Polygon","coordinates":[[[-87.359296,35.00118],[-85.606675,34.984749],[-85.431413,34.124869],[-85.184951,32.859696],[-85.069935,32.580372],[-84.960397,32.421541],[-85.004212,32.322956],[-84.889196,32.262709],[-85.058981,32.13674],[-85.053504,32.01077],[-85.141136,31.840985],[-85.042551,31.539753],[-85.113751,31.27686],[-85.004212,31.003013],[-85.497137,30.997536],[-87.600282,30.997536],[-87.633143,30.86609],[-87.408589,30.674397],[-87.446927,30.510088],[-87.37025,30.427934],[-87.518128,30.280057],[-87.655051,30.247195],[-87.90699,30.411504],[-87.934375,30.657966],[-88.011052,30.685351],[-88.10416,30.499135],[-88.137022,30.318396],[-88.394438,30.367688],[-88.471115,31.895754],[-88.241084,33.796253],[-88.098683,34.891641],[-88.202745,34.995703],[-87.359296,35.00118]]]}},
-		{"type":"Feature","id":"04","properties":
-		{"AU12":"573103","happinessIndex":9},"geometry":{"type":"Polygon","coordinates":[[[-87.359296,35.00118],[-85.606675,34.984749],[-85.431413,34.124869],[-85.184951,32.859696],[-85.069935,32.580372],[-84.960397,32.421541],[-85.004212,32.322956],[-84.889196,32.262709],[-85.058981,32.13674],[-85.053504,32.01077],[-85.141136,31.840985],[-85.042551,31.539753],[-85.113751,31.27686],[-85.004212,31.003013],[-85.497137,30.997536],[-87.600282,30.997536],[-87.633143,30.86609],[-87.408589,30.674397],[-87.446927,30.510088],[-87.37025,30.427934],[-87.518128,30.280057],[-87.655051,30.247195],[-87.90699,30.411504],[-87.934375,30.657966],[-88.011052,30.685351],[-88.10416,30.499135],[-88.137022,30.318396],[-88.394438,30.367688],[-88.471115,31.895754],[-88.241084,33.796253],[-88.098683,34.891641],[-88.202745,34.995703],[-87.359296,35.00118]]]}}
-		]};
-		var columnWidth = 50;
-		var columnPadding = 1;
-		var w = statesData.features.length * (columnWidth + columnPadding);
-		var h = 200;
-		var svg = d3.select("body")
-            .append("svg")
-            .attr("width", w)
-            .attr("height", h);
+        <div id="map">
+            <!-- map goes here -->
+        </div>
 
-    	svg.selectAll("g")
-		   	.data(statesData.features)
-		   	.enter()
-		   	.append("g")
-		   	.append("rect")
-		   	.attr("x", 0)
-		   	.attr("y", function(d) { return h - d.properties.happinessIndex * 20;})
-		   	.attr("width", columnWidth)
-		   	.attr("height", function(d, i) { return d.properties.happinessIndex * 20;})
-		   	.attr("x", function(d, i) {return i * (columnWidth + columnPadding);})		   	
-		   	.attr("fill", "rgba(0, 0, 255, .35)")
-		   	.on("mouseenter", function(d, i) {
-		   		d3.select(this)
-		   			.attr("fill", "blue");
-		   		d3.select(this.parentNode)
-		   			.append("text")
-		   			.attr("text-anchor", "middle")
-		   			.text(function(d) {return d.properties.happinessIndex;})
-		   			.attr("x", function(d) {return i * (w / statesData.features.length) + (columnWidth/2);})
-		   			.attr("y", function(d) {return (h - (d.properties.happinessIndex) * 20) + 15;})
-		   			.attr("font-family", "Courier")
-		   			.attr("font-size", "14px")
-		   			.attr("fill", "white")
-		   			.attr("font-weight", "bold");		   			
-			})
-			.on("mouseout", function(d) {
-				d3.select(this)
-					.attr("fill", "rgba(0, 0, 255, .35)");
-					d3.select(this.parentNode)
-					.selectAll("text")
-					.remove("text");
-			});
-        </script>
+     <!--    <div id="graph">
+            <h1 class="graphTitle">Happiness Index</h1>
+            <! graph goes here -->
+     <!-- </div> <!-->
     </body>
-</html> 
 
-
-			
-			   
+</html>
